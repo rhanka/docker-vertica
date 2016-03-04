@@ -1,6 +1,7 @@
 # docker-vertica
 
 A docker image for Vertica Community, run as single node or multi node
+Can be found on DockerHub at <https://hub.docker.com/r/fjehl/docker-vertica/>
 
 ## Usage
 
