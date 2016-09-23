@@ -1,0 +1,41 @@
+#!/bin/bash
+
+set -e
+
+if [[ "$NODE_TYPE" == "master" ]]
+then
+  echo "Installing a Vertica cluster from this master node"
+  # Vertica install script
+  ${VERTICA_HOME}/sbin/install_vertica \
+    --hosts "$CLUSTER_NODES" \
+    --rpm /tmp/vertica.rpm \
+    --no-system-configuration \
+    --license CE \
+    --accept-eula \
+    --dba-user dbadmin \
+    --dba-user-password-disabled \
+    --failure-threshold NONE
+  
+  echo "Creating the Docker database"
+  su - dbadmin -c "${VERTICA_HOME}/bin/admintools \
+    -t create_db \
+    -s "$CLUSTER_NODES" \
+    -d docker \
+    -c ${VERTICA_HOME}/catalog \
+    -D ${VERTICA_HOME}/data \
+    --skip-fs-checks"
+ 
+  echo "---------------------------------------------------------------------------------------------------------------------------------------"
+  echo "You can now connect to the server '$(hostname -I)' on port 5433, using the 'docker' database with the user 'dbadmin' without password."
+  echo "---------------------------------------------------------------------------------------------------------------------------------------"
+fi
+
+if [[ "$OUTPUT_VERTICA_LOG" == "true" ]]
+then
+  # We can't use follow/retry because the parent directory itself does not exist
+  while [ ! -f ${VERTICA_HOME}/catalog/*/*/vertica.log ]
+  do
+    sleep 5
+  done
+  tail -f ${VERTICA_HOME}/catalog/*/*/vertica.log
+fi

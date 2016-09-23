@@ -1,0 +1,51 @@
+version: 2
+services:
+  node_1:
+    build:
+      context: .
+      args:
+        VERTICA_RPM: vertica-8.0.0-0.x86_64.RHEL6.rpm
+    ports:
+     - "5433:5433"
+    environment:
+      OUTPUT_VERTICA_LOG: "false"
+      NODE_TYPE: "master"
+      CLUSTER_NODES: "node_1,node_2,node_3"
+    depends_on:
+     - node_2
+     - node_3
+    links:
+     - node_2
+     - node_3
+    cap_add:
+     - SYS_NICE
+     - SYS_RESOURCE
+  node_2:
+    build: 
+      context: .
+      args:
+        VERTICA_RPM: vertica-8.0.0-0.x86_64.RHEL6.rpm
+    environment:
+      OUTPUT_VERTICA_LOG: "false"
+      NODE_TYPE: "slave"
+    expose:
+      - "22"
+      - "5433"
+    cap_add:
+      - SYS_NICE
+      - SYS_RESOURCE
+  node_3:
+    build:
+      context: .
+      args:
+        VERTICA_RPM: vertica-8.0.0-0.x86_64.RHEL6.rpm
+    environment:
+      OUTPUT_VERTICA_LOG: "false"
+      NODE_TYPE: "slave"
+    expose:
+      - "22"
+      - "5433"
+    cap_add:
+      - SYS_NICE
+      - SYS_RESOURCE
+
