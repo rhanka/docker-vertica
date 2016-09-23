@@ -4,7 +4,8 @@ set -e
 
 if [[ "$NODE_TYPE" == "master" ]]
 then
-  echo "Installing a Vertica cluster from this master node"
+  echo "Setting up a Vertica cluster from this master node..."
+
   # Vertica install script
   ${VERTICA_HOME}/sbin/install_vertica \
     --hosts "$CLUSTER_NODES" \
@@ -15,8 +16,10 @@ then
     --dba-user dbadmin \
     --dba-user-password-disabled \
     --failure-threshold NONE
-  
-  echo "Creating the Docker database"
+
+  echo "Cluster is now set up"
+  echo "Now creating the database..."
+
   su - dbadmin -c "${VERTICA_HOME}/bin/admintools \
     -t create_db \
     -s "$CLUSTER_NODES" \
@@ -24,7 +27,13 @@ then
     -c ${VERTICA_HOME}/catalog \
     -D ${VERTICA_HOME}/data \
     --skip-fs-checks"
- 
+
+  echo "Database created on the cluster"
+  echo "Finally putting some data in it"
+
+  su - dbadmin -c "cd /opt/vertica/examples/VMart_Schema/;./vmart_gen >/dev/null 2>&1;/opt/vertica/bin/vsql -q -f vmart_define_schema.sql;/opt/vertica/bin/vsql -q -f vmart_load_data.sql"
+
+  echo "Data imported successfully!"
   echo "---------------------------------------------------------------------------------------------------------------------------------------"
   echo "You can now connect to the server '$(hostname -I)' on port 5433, using the 'docker' database with the user 'dbadmin' without password."
   echo "---------------------------------------------------------------------------------------------------------------------------------------"

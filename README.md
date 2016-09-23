@@ -8,25 +8,15 @@ Can be found on DockerHub at <https://hub.docker.com/r/fjehl/docker-vertica/>
 ### Build
 
 Download Vertica community edition at my.vertica.com.
-Run :
+Edit docker-compose.yml and set the VERTICA_RPM value to the appropriate path on the host
 
-    docker build --build-arg VERTICA_RPM=<vertica_rpm_path> -t fjehl/docker-vertica .
+Execute :
+    docker-compose build
 
 ### Run
 
-#### Single Node
-
-    docker run --name vertica fjehl/docker-vertica
-
-#### Multi node
-Create a docker network
-
-    docker network create vertica
-Run several containers, the last one being responsible of launching the install script.
-
-    docker run --name vertica03 --hostname vertica03 --net=vertica -d fjehl/docker-vertica noinstall
-    docker run --name vertica02 --hostname vertica02 --net=vertica -d fjehl/docker-vertica noinstall
-    docker run --name vertica01 --hostname vertica01 --net=vertica fjehl/docker-vertica install "vertica01,vertica02,vertica03"
+Execute:
+    docker-compose up
 
 ## Host configuration
 
