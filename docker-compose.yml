@@ -1,4 +1,4 @@
-version: 2
+version: '2'
 services:
   node_1:
     build:
@@ -57,3 +57,4 @@ volumes:
     driver: local
   node_3_data:
     driver: local
+

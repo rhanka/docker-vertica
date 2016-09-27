@@ -1,9 +1,5 @@
-FROM centos:7.2.1511 
+FROM centos:centos7.2.1511
 MAINTAINER Francois Jehl <f.jehl@criteo.com>
-
-# Create DBAdmin
-RUN groupadd -r verticadba
-RUN useradd -r -m -g verticadba dbadmin
 
 # Environment Variables
 ENV VERTICA_HOME /opt/vertica
@@ -28,10 +24,11 @@ RUN yum install -y \
 RUN easy_install supervisor
 
 # DBAdmin account configuration
+RUN groupadd -r verticadba
+RUN useradd -r -m -g verticadba dbadmin
 USER dbadmin
 RUN echo "export LANG=en_US.UTF-8" >> ~/.bash_profile
 RUN echo "export TZ=/usr/share/zoneinfo/Etc/Universal" >> ~/.bash_profile
-
 RUN mkdir ~/.ssh && cd ~/.ssh && ssh-keygen -t rsa -q -f id_rsa
 RUN cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 
