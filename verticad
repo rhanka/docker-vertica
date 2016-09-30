@@ -3,16 +3,38 @@
 at_sigint() {
   if [[ "$NODE_TYPE" == "master" ]]
   then
+    echo "Received SIGINT on the master node: stopping the database..."
     su - dbadmin -c "${VERTICA_HOME}/bin/admintools -t stop_db -d docker"
+    echo "Database has been stopped on the master node".
   else
-    while kill -0 $(pgrep -f "/opt/vertica/bin/vertica -D"); do
-      sleep 1
+    while ! su - dbadmin -c "${VERTICA_HOME}/bin/admintools -t db_status -s DOWN" | grep -q docker && pgrep --exact vertica >/dev/null
+    do
+      echo "Waiting for the database to shutdown before stopping the node..."
+      sleep 2
     done
+    echo "Database not running anymore: shutting down the node."
   fi
   exit 0
 }
 
 set -e
+
+if [[ ! -d "${VERTICA_HOME}" ]]
+then
+  echo "${VERTICA_HOME} does not exist in the guest. Please mount a data volume on ${VERTICA_HOME} and restart the guest."
+  exit 1
+fi
+
+capabilities=$(capsh --print | grep Current)
+for capability in SYS_NICE, SYS_RESOURCE
+do
+  if ! echo $capabilities | grep -qi $capability
+  then
+    echo "Missing $capability. Start the container with --cap-add $capability."
+    exit 1
+  fi
+done
+
 
 if [[ ! -d "${VERTICA_HOME}/catalog" ]] || [[ ! -d "${VERTICA_HOME}/data" ]]
 then
@@ -83,6 +105,6 @@ fi
 
 trap at_sigint INT
 while true; do
-  sleep 10
+  sleep 2
 done
 

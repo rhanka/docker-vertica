@@ -45,10 +45,7 @@ RUN echo "dbadmin    -    nice  0" >> /etc/security/limits.conf
 
 #SupervisorD configuration
 COPY supervisord.conf /etc/supervisord.conf
-COPY setup.sh /usr/local/bin/setup.sh
-
-#Vertica Volume
-VOLUME ${VERTICA_HOME}
+COPY verticad /usr/local/bin/verticad
 
 #Starting supervisor
 CMD ["/usr/bin/supervisord", "-n"]
