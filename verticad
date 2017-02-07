@@ -47,8 +47,8 @@ echo "Data and catalog dirs exist on this node."
 
 if [[ "$NODE_TYPE" == "master" ]]
 then
-  if ! rpm -q vertica
-  then 
+  if [[ ! -d "${VERTICA_HOME}/bin" ]]
+  then
     echo "Installing RPM on this node..."
     rpm -Uvh /tmp/vertica.rpm
     chown -R dbadmin:verticadba ${VERTICA_HOME}/config

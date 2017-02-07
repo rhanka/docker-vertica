@@ -1,12 +1,11 @@
-FROM centos:centos7.2.1511
+FROM centos:centos7.3.1611
 MAINTAINER Francois Jehl <f.jehl@criteo.com>
 
 # Environment Variables
 ENV VERTICA_HOME /opt/vertica
 ENV NODE_TYPE master
 ENV CLUSTER_NODES localhost
-RUN localedef --quiet -c -i en_US -f UTF-8 en_US.UTF-8
-
+RUN localedef -i en_US -f UTF-8 en_US.UTF-8
 # Yum dependencies
 RUN yum install -y \
     which \
