@@ -5,6 +5,7 @@ MAINTAINER Francois Jehl <f.jehl@criteo.com>
 ENV VERTICA_HOME /opt/vertica
 ENV NODE_TYPE master
 ENV CLUSTER_NODES localhost
+RUN localedef --quiet -c -i en_US -f UTF-8 en_US.UTF-8
 
 # Yum dependencies
 RUN yum install -y \
@@ -44,7 +45,12 @@ RUN echo "dbadmin    -    nofile  65536" >> /etc/security/limits.conf
 RUN echo "dbadmin    -    nice  0" >> /etc/security/limits.conf
 
 #SupervisorD configuration
+COPY sshd.sv.conf /etc/supervisor/conf.d/
+COPY ntpd.sv.conf /etc/supervisor/conf.d/
+COPY verticad.sv.conf /etc/supervisor/conf.d/
 COPY supervisord.conf /etc/supervisord.conf
+
+# Vertica daemon-like startup script
 COPY verticad /usr/local/bin/verticad
 
 #Starting supervisor
