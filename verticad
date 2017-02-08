@@ -94,7 +94,7 @@ then
   if ! su - dbadmin -c "${VERTICA_HOME}/bin/vsql -qt -c 'select schema_name from schemata'" | grep -q online_sales
   then 
     echo "Importing VMart schema data in this cluster"
-    su - dbadmin -c "cd /opt/vertica/examples/VMart_Schema/;./vmart_gen >/dev/null 2>&1;/opt/vertica/bin/vsql -q -f vmart_define_schema.sql;/opt/vertica/bin/vsql -q -f vmart_load_data.sql"
+    su - dbadmin -c "cd /opt/vertica/examples/VMart_Schema/;./vmart_gen >/dev/null 2>&1;/opt/vertica/bin/vsql -q -t -f vmart_define_schema.sql >/dev/null 2>&1;/opt/vertica/bin/vsql -q -t -f vmart_load_data.sql >/dev/null 2>&1"
   fi
   echo "The VMart schema is imported."
 
