@@ -103,6 +103,8 @@ then
   echo "---------------------------------------------------------------------------------------------------------------------------------------"
 fi
 
+echo "<!--XSUPERVISOR:BEGIN-->Vertica started<!--XSUPERVISOR:END-->"
+
 trap at_sigint INT
 while true; do
   sleep 2
