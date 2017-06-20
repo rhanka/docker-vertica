@@ -1,11 +1,14 @@
-FROM centos:centos7.3.1611
-MAINTAINER Francois Jehl <f.jehl@criteo.com>
+FROM centos:centos7
+MAINTAINER Francois Jehl <francoisjehl@gmail.com>
 
 # Environment Variables
 ENV VERTICA_HOME /opt/vertica
+ENV WITH_VMART false
 ENV NODE_TYPE master
 ENV CLUSTER_NODES localhost
+
 RUN localedef -i en_US -f UTF-8 en_US.UTF-8
+
 # Yum dependencies
 RUN yum install -y \
     which \
@@ -19,8 +22,21 @@ RUN yum install -y \
     mcelog \
     bc \
     ntp \
+    gcc-c++ \
+    cmake \
     python-setuptools
 
+# Debug infos for GDB
+RUN debuginfo-install -y \
+    expat \
+    glibc \
+    keyutils-libs \
+    libcom_err \
+    libgcc \
+    libstdc++ \
+    zlib
+
+# Install supervisor
 RUN easy_install supervisor
 
 # DBAdmin account configuration

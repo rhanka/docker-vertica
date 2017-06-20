@@ -8,6 +8,7 @@ services:
     environment:
       NODE_TYPE: "master"
       CLUSTER_NODES: "node_1,node_2,node_3"
+      WITH_VMART: false
     depends_on:
       - node_2
       - node_3
@@ -17,6 +18,7 @@ services:
     cap_add:
       - SYS_NICE
       - SYS_RESOURCE
+      - SYS_PTRACE
     volumes:
       - node_1_data:/opt/vertica
       - ${VERTICA_RPM_PATH}:/tmp/vertica.rpm
@@ -32,6 +34,7 @@ services:
     cap_add:
       - SYS_NICE
       - SYS_RESOURCE
+      - SYS_PTRACE
     volumes:
       - node_2_data:/opt/vertica
       - ${VERTICA_RPM_PATH}:/tmp/vertica.rpm
@@ -47,6 +50,7 @@ services:
     cap_add:
       - SYS_NICE
       - SYS_RESOURCE
+      - SYS_PTRACE
     volumes:
       - node_3_data:/opt/vertica
       - ${VERTICA_RPM_PATH}:/tmp/vertica.rpm

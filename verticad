@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# SIGINT trap to shut down the DB properly upon CTRL+C
 at_sigint() {
   if [[ "$NODE_TYPE" == "master" ]]
   then
@@ -45,6 +46,10 @@ then
 fi
 echo "Data and catalog dirs exist on this node."
 
+
+
+# Everything that gets executed in this block should happen once and only once
+# Hence the concept of 'master' node, that has no meaning in Vertica itself
 if [[ "$NODE_TYPE" == "master" ]]
 then
   if [[ ! -d "${VERTICA_HOME}/bin" ]]
@@ -71,6 +76,7 @@ then
   fi
   echo "The cluster is set up."
 
+  # Sets up a cluster (a set of nodes sharing the same spread configuration)
   if ! su - dbadmin -c "${VERTICA_HOME}/bin/admintools -t view_cluster" | grep -q docker
   then
     echo "Now creating the database..."
@@ -84,6 +90,7 @@ then
   fi
   echo "The docker database has been created on the cluster."
 
+  # Starts vertica up if it is not already started
   if ! su - dbadmin -c "${VERTICA_HOME}/bin/admintools -t db_status -s UP" | grep -q docker
   then
     echo "Starting Vertica..."
@@ -91,12 +98,16 @@ then
   fi
   echo "Vertica is started."
 
-  if ! su - dbadmin -c "${VERTICA_HOME}/bin/vsql -qt -c 'select schema_name from schemata'" | grep -q online_sales
-  then 
-    echo "Importing VMart schema data in this cluster"
-    su - dbadmin -c "cd /opt/vertica/examples/VMart_Schema/;./vmart_gen >/dev/null 2>&1;/opt/vertica/bin/vsql -q -t -f vmart_define_schema.sql >/dev/null 2>&1;/opt/vertica/bin/vsql -q -t -f vmart_load_data.sql >/dev/null 2>&1"
+  # Installs the VMart test schema if this has been supplied as environment variable
+  if [ ${WITH_VMART} = true ]
+  then
+    if ! su - dbadmin -c "${VERTICA_HOME}/bin/vsql -qt -c 'select schema_name from schemata'" | grep -q online_sales
+    then 
+      echo "Importing VMart schema data in this cluster"
+      su - dbadmin -c "cd /opt/vertica/examples/VMart_Schema/;./vmart_gen >/dev/null 2>&1;/opt/vertica/bin/vsql -q -t -f vmart_define_schema.sql >/dev/null 2>&1;/opt/vertica/bin/vsql -q -t -f vmart_load_data.sql >/dev/null 2>&1"
+    fi
+    echo "The VMart schema is imported."
   fi
-  echo "The VMart schema is imported."
 
   echo "---------------------------------------------------------------------------------------------------------------------------------------"
   echo "You can now connect to the server '$(hostname -I)' on port 5433, using the 'docker' database with the user 'dbadmin' without password."
@@ -105,8 +116,8 @@ fi
 
 echo "<!--XSUPERVISOR:BEGIN-->Vertica started<!--XSUPERVISOR:END-->"
 
+# Registers a SIGINT trap and sleeps until CTRL+C is pressed
 trap at_sigint INT
 while true; do
   sleep 2
 done
-
