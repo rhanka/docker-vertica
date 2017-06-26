@@ -101,14 +101,15 @@ Options are usually the same. You'll just supply a mount point that holds the bu
 docker run \
       -v ~/Downloads/vertica-8.0.0-0.x86_64.RHEL6.rpm:/tmp/vertica.rpm \
       -v docker-vertica:/opt/vertica \
-      -v /home/fjehl/git/vertica-getdatafromnode:/home/dbadmin/lib \
+      -v /home/fjehl/git/vertica-getdatafromnode:/home/fjehl/git/vertica-getdatafromnode \
       --cap-add SYS_NICE --cap-add SYS_RESOURCE --cap-add SYS_PTRACE \
       --name docker-vertica \
       -ti fjehl/docker-vertica
 ```
 
-### Compile the UDF
+### Compile the UDF inside the container
 
+Use your favourite build tool with a docker exec command.
 If you're using CMake, an example could look like this:
 
 ```
@@ -144,7 +145,7 @@ Linking CXX shared library libgetdatafromnode.so
 
 There's now a binary, it can be registered.
 
-### Register it
+### Register it in Vertica
 
 You can directly connect from VSQL. Normally, the install script should have written the IP on stdout.
 It could be 172.17.0.2, as in the following example.
@@ -156,8 +157,8 @@ vsql -h 172.17.0.2 -U dbadmin
 Then register the library:
 
 ```
-CREATE OR REPLACE LIBRARY libgetdatafromnode 
-  AS '/home/dbadmin/lib/build/libgetdatafromnode.so';
+CREATE OR REPLACE LIBRARY libgetdatafromnode
+  AS '/home/fjehl/git/vertica-getdatafromnode/build/libgetdatafromnode.so';
 ```
 And the functions you want to use.
 
@@ -172,12 +173,12 @@ CREATE OR REPLACE TRANSFORM FUNCTION GET_DATA_FROM_NODE
 Test that everything seems fine:
 
 ```
-SELECT 
+SELECT
   GET_DATA_FROM_NODE(* USING PARAMETERS node='v_docker_node0001') OVER (PARTITION AUTO) 
 FROM public.foo;
 ```
 ```
- bar 
+ bar
 -----
    1
    2
@@ -186,17 +187,17 @@ FROM public.foo;
 (4 rows)
 ```
 ### Debug it using GDB
-You can now use docker exec to debug it.
-Log in to the container:
+
+Start GDB attached to the running GDBServer, as output by docker run's stdout.
 
 ```
-docker exec -ti docker-vertica /bin/bash -c
+(gdb) target extended-remote 172.17.0.2:2159
 ```
 
-And start GDB attached to the running Vertica process:
+Then attach to Vertica's PID, again as advertised by docker run's stdout.
 
 ```
-gdb --pid $(pgrep -x vertica)
+(gdb) attach 116
 ```
 
 Symbols start to load:
@@ -229,14 +230,15 @@ And you finally get the GDB prompt.
 (gdb)
 ```
 
-For example to set a break point:
+You can now register code, and set some breakpoints for example:
 
 ```
-(gdb) break /home/dbadmin/lib/src/GetDataFromNode.cpp:40
+(gdb) directory
+(gdb) break /home/fjehl/git/vertica-getdatafromnode/src/GetDataFromNode.cpp:40
 ```
 
 ```
-Breakpoint 1 at 0x7f39782ebee0: file /home/dbadmin/lib/src/GetDataFromNode.cpp, line 40.
+Breakpoint 1 at 0x7f39782ebee0: file /home/fjehl/git/vertica-getdatafromnode/src/GetDataFromNode.cpp, line 40.
 ```
 
 And restart the execution:

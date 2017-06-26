@@ -6,6 +6,7 @@ ENV VERTICA_HOME /opt/vertica
 ENV WITH_VMART false
 ENV NODE_TYPE master
 ENV CLUSTER_NODES localhost
+ENV GDBSERVER_PORT 2159
 
 RUN localedef -i en_US -f UTF-8 en_US.UTF-8
 
@@ -18,6 +19,7 @@ RUN yum install -y \
     iproute \
     dialog \
     gdb \
+    gdb-gdbserver \
     sysstat \
     mcelog \
     bc \
@@ -63,10 +65,14 @@ RUN echo "dbadmin    -    nice  0" >> /etc/security/limits.conf
 COPY sshd.sv.conf /etc/supervisor/conf.d/
 COPY ntpd.sv.conf /etc/supervisor/conf.d/
 COPY verticad.sv.conf /etc/supervisor/conf.d/
+COPY gdbserverd.sv.conf /etc/supervisor/conf.d/
 COPY supervisord.conf /etc/supervisord.conf
 
-# Vertica daemon-like startup script
+# Vertica and GDB daemon-like startup scripts
 COPY verticad /usr/local/bin/verticad
+COPY gdbserverd /usr/local/bin/gdbserverd
 
+EXPOSE 5433
+EXPOSE ${GDBSERVER_PORT}
 #Starting supervisor
 CMD ["/usr/bin/supervisord", "-n"]

@@ -5,7 +5,7 @@ at_sigint() {
   if [[ "$NODE_TYPE" == "master" ]]
   then
     echo "Received SIGINT on the master node: stopping the database..."
-    su - dbadmin -c "${VERTICA_HOME}/bin/admintools -t stop_db -d docker"
+    su - dbadmin -c "${VERTICA_HOME}/bin/admintools -t stop_db -d docker --force"
     echo "Database has been stopped on the master node".
   else
     while ! su - dbadmin -c "${VERTICA_HOME}/bin/admintools -t db_status -s DOWN" | grep -q docker && pgrep --exact vertica >/dev/null
@@ -109,12 +109,15 @@ then
     echo "The VMart schema is imported."
   fi
 
+  ip=$(hostname --all-ip-addresses | awk '{print $1}')
   echo "---------------------------------------------------------------------------------------------------------------------------------------"
-  echo "You can now connect to the server '$(hostname -I)' on port 5433, using the 'docker' database with the user 'dbadmin' without password."
+  echo "You can now connect to the server '${ip}' on port 5433, using the 'docker' database with the user 'dbadmin' without password."
+  echo "GDBServer can be attached to with \"target extended-remote ${ip}:${GDBSERVER_PORT}\"."
+  echo "You can attach to the Vertica PID using \"attach $(pgrep -x vertica)\"."
   echo "---------------------------------------------------------------------------------------------------------------------------------------"
 fi
 
-echo "<!--XSUPERVISOR:BEGIN-->Vertica started<!--XSUPERVISOR:END-->"
+echo "<!--XSUPERVISOR:BEGIN-->VERTICASTART<!--XSUPERVISOR:END-->"
 
 # Registers a SIGINT trap and sleeps until CTRL+C is pressed
 trap at_sigint INT

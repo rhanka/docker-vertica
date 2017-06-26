@@ -1,0 +1,8 @@
+#!/bin/bash
+
+printf "READY\n"
+while read line; do
+    # Could be using gdbserver :${GDBSERVER_PORT} --attach $(pgrep -x vertica) >&2 if attached to the running PID
+    gdbserver --multi :${GDBSERVER_PORT} >&2
+    printf "RESULT 2\nOK"
+done < /dev/stdin
