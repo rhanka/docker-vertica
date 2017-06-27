@@ -233,7 +233,7 @@ And you finally get the GDB prompt.
 You can now register code, and set some breakpoints for example:
 
 ```
-(gdb) directory
+(gdb) directory /home/fjehl/git/vertica-getdatafromnode/src/
 (gdb) break /home/fjehl/git/vertica-getdatafromnode/src/GetDataFromNode.cpp:40
 ```
 
@@ -275,6 +275,39 @@ Breakpoint 1, GetDataFromNode::processPartition (this=<optimized out>, srvInterf
 You can now use all the popular GDB commands and features (n, step, bt, etc...) to debug your execution flow.
 You can follow this [excellent cheat sheet](http://darkdust.net/files/GDB%20Cheat%20Sheet.pdf) if you never used GDB.
 
+### Debug it in Visual Studio Code
+
+You can use the following configuration. Edit the destination host, path and source files with yours.
+
+
+```
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/opt/vertica/bin/vertica",
+            "setupCommands": [
+                {"text": "directory '${workspaceRoot}/vertica-getdatafromnode/src'"},
+                {"text": "target extended-remote 172.17.0.2:2159"},
+                {"text": "attach 116"}
+            ],
+            "launchCompleteCommand": "None",
+            "filterStderr": false,
+            "filterStdout": false,
+            "externalConsole": false,
+            "cwd": "${workspaceRoot}",
+            "logging": {
+                "engineLogging": true,
+                "trace": true,
+                "traceResponse": true
+            }
+        }
+    ]
+}
+```
 
 ## Advanced host configuration
 You'll notice that some checks fail during installation. This is because some checks are indeed checking the host machines due to Docker not being a virtualization layer per se. If you want to have a clean install, consider fixing those below.
