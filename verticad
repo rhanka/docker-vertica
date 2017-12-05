@@ -99,7 +99,7 @@ then
   echo "Vertica is started."
 
   # Installs the VMart test schema if this has been supplied as environment variable
-  if [ ${WITH_VMART} = true ]
+  if [ ${WITH_VMART} = 'true' ]
   then
     if ! su - dbadmin -c "${VERTICA_HOME}/bin/vsql -qt -c 'select schema_name from schemata'" | grep -q online_sales
     then 
