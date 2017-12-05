@@ -77,8 +77,7 @@ docker-compose build .
 #### Starting the cluster
 Given that the RPM is installed at runtime, you need to download Vertica community edition at [http://my.vertica.com](http://my.vertica.com), and store it somewhere. You just need to provide it as an env variable.
 ```
-VERTICA_RPM_PATH=~/Downloads/vertica-8.0.0-0.x86_64.RHEL6.rpm \
-docker-compose up
+VERTICA_RPM_PATH=~/Downloads/vertica-8.0.0-0.x86_64.RHEL6.rpm docker-compose up
 ```
 
 #### Killing the container in a clean way
