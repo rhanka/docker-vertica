@@ -8,7 +8,7 @@ services:
     environment:
       NODE_TYPE: "master"
       CLUSTER_NODES: "node_1,node_2,node_3"
-      WITH_VMART: false
+      WITH_VMART: 'false'
     depends_on:
       - node_2
       - node_3
