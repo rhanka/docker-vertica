@@ -1,64 +1,20 @@
 version: '2'
-services:
-  node_1:
-    build:
-      context: .
-    ports:
-     - "5433:5433"
-    environment:
-      NODE_TYPE: "master"
-      CLUSTER_NODES: "node_1,node_2,node_3"
-      WITH_VMART: 'false'
-    depends_on:
-      - node_2
-      - node_3
-    links:
-      - node_2
-      - node_3
-    cap_add:
-      - SYS_NICE
-      - SYS_RESOURCE
-      - SYS_PTRACE
-    volumes:
-      - node_1_data:/opt/vertica
-      - ${VERTICA_RPM_PATH}:/tmp/vertica.rpm
-  node_2:
-    build:
-      context: .
-    environment:
-      NODE_TYPE: "slave"
-      VERTICA_HOME: "/opt/vertica"
-    expose:
-      - "22"
-      - "5433"
-    cap_add:
-      - SYS_NICE
-      - SYS_RESOURCE
-      - SYS_PTRACE
-    volumes:
-      - node_2_data:/opt/vertica
-      - ${VERTICA_RPM_PATH}:/tmp/vertica.rpm
-  node_3:
-    build:
-      context: .
-    environment:
-      NODE_TYPE: "slave"
-      VERTICA_HOME: "/opt/vertica"
-    expose:
-      - "22"
-      - "5433"
-    cap_add:
-      - SYS_NICE
-      - SYS_RESOURCE
-      - SYS_PTRACE
-    volumes:
-      - node_3_data:/opt/vertica
-      - ${VERTICA_RPM_PATH}:/tmp/vertica.rpm
-volumes:
-  node_1_data:
-    driver: local
-  node_2_data:
-    driver: local
-  node_3_data:
-    driver: local
 
+networks:
+  default:
+    external:
+      name: latelier
+
+services:
+  vertica:
+    build: .
+    image: vertica
+    container_name: vertica
+    cap_add:
+      - SYS_NICE
+      - SYS_RESOURCE
+      - SYS_PTRACE
+    volumes:
+      - ./vertica-9.0.1-0.x86_64.RHEL6.rpm:/tmp/vertica.rpm
+      - ./data:/opt/vertica
+    
