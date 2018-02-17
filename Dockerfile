@@ -12,6 +12,9 @@ ENV VERTICA_HOME=/opt/vertica \
     GDBSERVER_PORT=2159
 ARG ENABLE_GDB_DEBUG=true
 
+ENV http_proxy $proxy
+ENV https_proxy $proxy
+
 RUN localedef -i en_US -f UTF-8 en_US.UTF-8
 
 # Yum dependencies

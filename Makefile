@@ -34,6 +34,9 @@ network:
 build:
 	docker build --build-arg proxy=${http_proxy} -t vertica .
 
+build:
+	docker build --build-arg proxy=${http_proxy} -t vertica .
+
 up: network
 	docker-compose up -d
 
