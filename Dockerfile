@@ -1,5 +1,6 @@
 FROM centos:centos7
 MAINTAINER Francois Jehl <francoisjehl@gmail.com>
+ARG proxy
 
 # Environment Variables
 ENV VERTICA_HOME /opt/vertica
@@ -7,6 +8,8 @@ ENV WITH_VMART false
 ENV NODE_TYPE master
 ENV CLUSTER_NODES localhost
 ENV GDBSERVER_PORT 2159
+ENV http_proxy $proxy
+ENV https_proxy $proxy
 
 RUN localedef -i en_US -f UTF-8 en_US.UTF-8
 

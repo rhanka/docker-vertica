@@ -22,6 +22,9 @@ endif
 network: 
 	@docker network create latelier 2> /dev/null; true
 
+build:
+	docker build --build-arg proxy=${http_proxy} -t vertica .
+
 up: network
 	docker-compose up -d
 
