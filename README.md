@@ -67,17 +67,27 @@ docker kill --signal SIGINT docker-vertica
 ### Start a multi-node cluster
 A docker-compose.yml has been designed to ease configuration of a multi-node cluster.
 
+#### Download a Vertica RPM, expose it through an env variable
+
+Go to [the MyVertica website](http://my.vertica.com) and download a CentOS / RHEL version.
+Store it somewhere on your system, then export its location to an environment variable:
+
+```
+export VERTICA_RPM_PATH=~/Downloads/vertica-X.Y.Z-T.x86_64.RHEL6.rpm
+```
+
 #### Building the images
 Use docker-compose build inside the image directory.
 
 ```
-docker-compose build .
+docker-compose build
 ```
 
 #### Starting the cluster
-Given that the RPM is installed at runtime, you need to download Vertica community edition at [http://my.vertica.com](http://my.vertica.com), and store it somewhere. You just need to provide it as an env variable.
+The cluster is now ready to start. Just submit the "up" command.
+
 ```
-VERTICA_RPM_PATH=~/Downloads/vertica-8.0.0-0.x86_64.RHEL6.rpm docker-compose up
+docker-compose up
 ```
 
 #### Killing the container in a clean way
