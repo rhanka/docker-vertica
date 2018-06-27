@@ -27,7 +27,7 @@ FROM fjehl/docker-vertica:latest
 ```
 
 Vertica is started using a verticad [http://supervisord.org/index.html](Supervisor) daemon, that emits a PROCESS_COMMUNICATION_STDOUT event on his stdout file descriptor. You can catch it using event handlers (see Supervisor documentation for this). Basically, your event handler should just send on its stdout a READY command once started, read lines from stdin, and issue a RESULT 2\\nOK once finished, as in the Python script you'll find in the following [http://supervisord.org/events.html](page).
-Nevertheless, you child image should 
+Nevertheless, you child image should
 - Add new supervisord programs or event handlers in /etc/supervisor/conf.d (they will get auto-loaded by the default supervisor.conf)
 - Have an entrypoint that runs supervisor like the current image
 
@@ -64,6 +64,13 @@ The container, and especially the vertica startup script (named **verticad**) ar
 ```
 docker kill --signal SIGINT docker-vertica
 ```
+
+#### Using your own license
+The Community Edition license only supports up to 3 nodes. If you ever want to go above this limit on your docker based cluster, you'll need an actual license. To get a license, contact the Vertica support team.
+If you have such license, you can use it simply by mounting in the container in `/tmp/license.dat`. For instance in `docker run` add the volume option : `-v /path/to/your/license:/tmp/license.dat`
+
+For docker-compose, edit the provided `docker-compose.yml` and add it to the volumes of the first container.
+
 ### Start a multi-node cluster
 A docker-compose.yml has been designed to ease configuration of a multi-node cluster.
 
@@ -96,11 +103,17 @@ The container, and especially the vertica startup script (named **verticad**) ar
 ```
 docker-compose kill -s SIGINT
 ```
+
+#### Large cluster setup
+You may want to use a docker cluster to experiment how Vertica behaves in large cluster mode. You can enable that by adding an environment variable `VERTICA_LARGE_CLUSTER` and setting its value to the number of control nodes you want.
+You only have to set it to the first container in the `docker-compose.yml` file.
+
+
 ## UDF Development
 
 This container already contains all the useful tools to debug custom UDFs. (GDB and all available symbols).
 
-The following debug examples use [the simple GET_DATA_FROM_NODE() UDF](https://github.com/francoisjehl/getdatafromnode). 
+The following debug examples use [the simple GET_DATA_FROM_NODE() UDF](https://github.com/francoisjehl/getdatafromnode).
 
 ### Start the container with your code mounted
 
@@ -172,10 +185,10 @@ CREATE OR REPLACE LIBRARY libgetdatafromnode
 And the functions you want to use.
 
 ```
-CREATE OR REPLACE TRANSFORM FUNCTION GET_DATA_FROM_NODE 
-  AS LANGUAGE 'C++' 
-  NAME 'GetDataFromNodeFactory' 
-  LIBRARY libgetdatafromnode 
+CREATE OR REPLACE TRANSFORM FUNCTION GET_DATA_FROM_NODE
+  AS LANGUAGE 'C++'
+  NAME 'GetDataFromNodeFactory'
+  LIBRARY libgetdatafromnode
   NOT FENCED;
 ```
 
@@ -183,7 +196,7 @@ Test that everything seems fine:
 
 ```
 SELECT
-  GET_DATA_FROM_NODE(* USING PARAMETERS node='v_docker_node0001') OVER (PARTITION AUTO) 
+  GET_DATA_FROM_NODE(* USING PARAMETERS node='v_docker_node0001') OVER (PARTITION AUTO)
 FROM public.foo;
 ```
 ```
@@ -329,10 +342,10 @@ To be performed in the system BIOS
 echo always > /sys/kernel/mm/transparent_hugepage/enabled
 ```
 ### Set a proper value to vm.min_free_kbytes
-```    
+```
 sysctl vm.min_free_kbytes=$(echo "scale=0;sqrt($(grep MemTotal /proc/meminfo | awk '{printf "%.0f",$2}')*16)" | bc )
 ```
 ### Set a proper value to vm.max_map_count
-```   
+```
 sysctl vm.vm.max_map_count=$(echo "$(grep MemTotal /proc/meminfo | awk '{printf "%.0f",$2}')/16" | bc)
 ```
