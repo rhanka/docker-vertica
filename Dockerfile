@@ -10,6 +10,7 @@ ENV CLUSTER_NODES localhost
 ENV GDBSERVER_PORT 2159
 ENV http_proxy $proxy
 ENV https_proxy $proxy
+ARG ENABLE_GDB_DEBUG=true
 
 RUN localedef -i en_US -f UTF-8 en_US.UTF-8
 
@@ -32,14 +33,15 @@ RUN yum install -y \
     python-setuptools
 
 # Debug infos for GDB
-RUN debuginfo-install -y \
+RUN if [ ${ENABLE_GDB_DEBUG} = 'true' ]; then debuginfo-install -y \
     expat \
     glibc \
     keyutils-libs \
     libcom_err \
     libgcc \
     libstdc++ \
-    zlib
+    zlib \
+    ; fi
 
 # Install supervisor
 RUN easy_install supervisor

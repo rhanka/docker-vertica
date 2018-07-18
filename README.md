@@ -349,3 +349,8 @@ sysctl vm.min_free_kbytes=$(echo "scale=0;sqrt($(grep MemTotal /proc/meminfo | a
 ```
 sysctl vm.vm.max_map_count=$(echo "$(grep MemTotal /proc/meminfo | awk '{printf "%.0f",$2}')/16" | bc)
 ```
+
+### Keep GDB debug info out of the build
+With GDB debug infos packages included, the image can get big (1.6GB at the time of this writing).
+Excluding them can reduce the image size to about 500MB.
+To do that, just add `--build-arg ENABLE_GDB_DEBUG=false` to your build command
