@@ -1,5 +1,10 @@
 EDITOR=vim
 
+export COMPOSE_PROJECT_NAME=latelier
+
+dummy               := $(shell touch artifacts)
+include ./artifacts
+
 include /etc/os-release
 
 install-prerequisites:
@@ -24,7 +29,7 @@ ifeq ("$(wildcard /usr/bin/docker)","")
 endif
 
 network: 
-	@docker network create latelier 2> /dev/null; true
+	@docker network create ${COMPOSE_PROJECT_NAME} 2> /dev/null; true
 
 build:
 	docker build --build-arg proxy=${http_proxy} -t vertica .
