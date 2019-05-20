@@ -1,4 +1,7 @@
 # docker-vertica
+![Build Config](https://img.shields.io/docker/cloud/automated/fjehl/docker-vertica.svg)
+![Build Status](https://img.shields.io/docker/cloud/build/fjehl/docker-vertica.svg)
+
 A docker image for Vertica Community, run as single node or multi-node.
 Can be found on DockerHub at <https://hub.docker.com/r/fjehl/docker-vertica/>.
 It can be used as a sandbox environment for UDF debugging.
