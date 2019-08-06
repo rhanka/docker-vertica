@@ -21,4 +21,4 @@ services:
     volumes:
       - ./vertica-9.0.1-0.x86_64.RHEL6.rpm:/tmp/vertica.rpm
       - ./data:/opt/vertica
-    
+      - ./cpuinfo:/proc/cpuinfo

@@ -7,6 +7,9 @@ include ./artifacts
 
 include /etc/os-release
 
+no-aws:
+	cat /proc/cpuinfo | sed 's/hypervisor //g' > cpuinfo
+
 install-prerequisites:
 ifeq ("$(wildcard /usr/bin/docker)","")
         @echo install docker-ce, still to be tested
@@ -37,7 +40,7 @@ build:
 build:
 	docker build --build-arg proxy=${http_proxy} -t vertica .
 
-up: network
+up: no-aws network
 	docker-compose up -d
 
 down:
