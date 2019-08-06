@@ -7,9 +7,13 @@ networks:
 
 services:
   vertica:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        proxy: ${http_proxy}
     image: vertica
-    container_name: vertica
+    container_name: vertica-${COMPOSE_PROJECT_NAME}
     cap_add:
       - SYS_NICE
       - SYS_RESOURCE
