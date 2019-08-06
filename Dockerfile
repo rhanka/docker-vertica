@@ -17,6 +17,11 @@ ENV https_proxy $proxy
 
 RUN localedef -i en_US -f UTF-8 en_US.UTF-8
 
+RUN if [ ! -z "$http_proxy" ] ; then \
+       echo "proxy=${http_proxy}" >> /etc/yum.conf; \
+       echo "timeout=300" >> /etc/yum.conf; \
+    fi;
+
 # Yum dependencies
 RUN yum install -y \
     which \
